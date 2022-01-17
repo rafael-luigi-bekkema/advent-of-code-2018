@@ -150,6 +150,16 @@ func CopySlice[T any](slice []T) []T {
 	return result
 }
 
+func Remove[T comparable](slice []T, remove ...T) []T {
+	result := []T{}
+	for _, val := range slice {
+		if !In(val, remove...) {
+			result = append(result, val)
+		}
+	}
+	return result
+}
+
 func NewGrid[T any](size int, init T) [][]T {
 	res := make([][]T, size)
 	for i := 0; i < size; i++ {
