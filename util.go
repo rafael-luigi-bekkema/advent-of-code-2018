@@ -151,7 +151,7 @@ func CopySlice[T any](slice []T) []T {
 }
 
 func Remove[T comparable](slice []T, remove ...T) []T {
-	result := []T{}
+	result := make([]T, 0, len(slice))
 	for _, val := range slice {
 		if !In(val, remove...) {
 			result = append(result, val)
