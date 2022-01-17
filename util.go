@@ -117,6 +117,24 @@ func MinMax[T constraints.Ordered](values []T) (min, max T) {
 	return min, max
 }
 
+func Max[T constraints.Ordered](values ...T) (max T) {
+	for i, v := range values {
+		if i == 0 || v > max {
+			max = v
+		}
+	}
+	return
+}
+
+func Min[T constraints.Ordered](values ...T) (min T) {
+	for i, v := range values {
+		if i == 0 || v < min {
+			min = v
+		}
+	}
+	return
+}
+
 func In[T comparable](item T, items ...T) bool {
 	for _, i := range items {
 		if i == item {
