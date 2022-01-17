@@ -10,6 +10,10 @@ type Result[T, U any] struct {
 	b U
 }
 
+func (r Result[T, U]) String() string {
+	return fmt.Sprintf("a=%v/b=%v", r.a, r.b)
+}
+
 func NewResult[T, U any](a T, b U) Result[T, U] {
 	return Result[T, U]{a, b}
 }
@@ -64,5 +68,5 @@ func day4a(input []string) Result[int, int] {
 			maxMin = m
 		}
 	}
-	return NewResult(maxGuard.id*maxMin, maxMinuteGuard.id *maxMinute)
+	return NewResult(maxGuard.id*maxMin, maxMinuteGuard.id*maxMinute)
 }

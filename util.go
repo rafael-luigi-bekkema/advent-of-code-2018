@@ -143,6 +143,13 @@ func Min[T constraints.Ordered](values ...T) (min T) {
 	return
 }
 
+func Sum[T constraints.Ordered](values ...T) (sum T) {
+	for _, val := range values {
+		sum += val
+	}
+	return
+}
+
 func In[T comparable](item T, items ...T) bool {
 	for _, i := range items {
 		if i == item {
