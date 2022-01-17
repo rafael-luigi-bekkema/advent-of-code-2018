@@ -105,6 +105,14 @@ func Map[T, U any](f func(v T) U, items []T) []U {
 	return out
 }
 
+func Reduce[T, U any](f func(U, T) U, items []T, init U) U {
+	var acc U
+	for _, item := range items {
+		acc = f(acc, item)
+	}
+	return acc
+}
+
 func MinMax[T constraints.Ordered](values []T) (min, max T) {
 	for i, v := range values {
 		if i == 0 || v < min {
