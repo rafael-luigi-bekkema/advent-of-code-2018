@@ -97,7 +97,7 @@ func Values[T any, K comparable](m map[K]T) []T {
 	return result
 }
 
-func Map[T, U any](f func(v T) U, items []T) []U {
+func Map[T, U any](items []T, f func(v T) U) []U {
 	out := make([]U, len(items))
 	for i := range items {
 		out[i] = f(items[i])

@@ -9,8 +9,8 @@ func day8a(input string) Result[int, int] {
 		meta     []int
 		children []*Node
 	}
-	ints := Map(Atoi, strings.Split(input, " "))
-	var value func(n *Node) int 
+	ints := Map(strings.Split(input, " "), Atoi)
+	var value func(n *Node) int
 	value = func(n *Node) (sum int) {
 		if len(n.children) == 0 {
 			return Sum(n.meta...)
