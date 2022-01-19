@@ -150,9 +150,9 @@ func Sum[T constraints.Ordered](values ...T) (sum T) {
 	return
 }
 
-func In[T comparable](item T, items ...T) bool {
+func In[T comparable](items []T, subject T) bool {
 	for _, i := range items {
-		if i == item {
+		if i == subject {
 			return true
 		}
 	}
@@ -168,7 +168,7 @@ func CopySlice[T any](slice []T) []T {
 func Remove[T comparable](slice []T, remove ...T) []T {
 	result := make([]T, 0, len(slice))
 	for _, val := range slice {
-		if !In(val, remove...) {
+		if !In(remove, val) {
 			result = append(result, val)
 		}
 	}
