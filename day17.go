@@ -47,12 +47,43 @@ func (grid *Grid) save() {
 func (grid *Grid) print(out io.Writer) {
 	for i, c := range grid.Data {
 		if i%grid.Width == 0 {
-			fmt.Fprintf(out, "\n%03d: ", i/grid.Width-1)
+			fmt.Fprintf(out, "\n%04d: ", i/grid.Width-1)
 		}
 		fmt.Fprintf(out, "%c", c)
 	}
 
 	fmt.Fprintln(out)
+}
+
+func (grid *Grid) removeWet() {
+	for y := 0; y < grid.Height; y++ {
+		for x := 0; x < grid.Width; x++ {
+			val := grid.Data[y*grid.Width+x]
+			if val != wet {
+				continue
+			}
+			grid.Data[y*grid.Width+x] = sand
+		lbl:
+			for sx := x-1; sx >= 0; sx-- {
+				switch grid.Data[y*grid.Width+sx] {
+				default:
+					break lbl
+				case water:
+					grid.Data[y*grid.Width+sx] = sand
+				}
+			}
+
+		lbl2:
+			for sx := x+1; sx < len(grid.Data); sx++ {
+				switch grid.Data[y*grid.Width+sx] {
+				default:
+					break lbl2
+				case water:
+					grid.Data[y*grid.Width+sx] = sand
+				}
+			}
+		}
+	}
 }
 
 func (grid *Grid) Score() int {
@@ -204,7 +235,6 @@ lbl2:
 
 func day17a(input []string, save bool) int {
 	grid := buildGrid(input)
-	//grid.print()
 
 	step(&grid, Point{source.x, source.y + 1})
 
@@ -213,7 +243,22 @@ func day17a(input []string, save bool) int {
 	} else {
 		grid.print(os.Stdout)
 	}
-	fmt.Println("Done")
+
+	return grid.Score()
+}
+
+func day17b(input []string, save bool) int {
+	grid := buildGrid(input)
+
+	step(&grid, Point{source.x, source.y + 1})
+
+	grid.removeWet()
+
+	if save {
+		grid.save()
+	} else {
+		grid.print(os.Stdout)
+	}
 
 	return grid.Score()
 }
