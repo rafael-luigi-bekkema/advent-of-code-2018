@@ -64,7 +64,7 @@ func (grid *Grid) removeWet() {
 			}
 			grid.Data[y*grid.Width+x] = sand
 		lbl:
-			for sx := x-1; sx >= 0; sx-- {
+			for sx := x - 1; sx >= 0; sx-- {
 				switch grid.Data[y*grid.Width+sx] {
 				default:
 					break lbl
@@ -74,7 +74,7 @@ func (grid *Grid) removeWet() {
 			}
 
 		lbl2:
-			for sx := x+1; sx < len(grid.Data); sx++ {
+			for sx := x + 1; sx < len(grid.Data); sx++ {
 				switch grid.Data[y*grid.Width+sx] {
 				default:
 					break lbl2
@@ -233,32 +233,44 @@ lbl2:
 	}
 }
 
-func day17a(input []string, save bool) int {
+func day17a(input []string, out io.Writer) int {
 	grid := buildGrid(input)
 
 	step(&grid, Point{source.x, source.y + 1})
 
-	if save {
-		grid.save()
-	} else {
-		grid.print(os.Stdout)
-	}
+	grid.print(out)
 
 	return grid.Score()
 }
 
-func day17b(input []string, save bool) int {
+func Day17a() int {
+	f, err := os.Create("day17a_out.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	return day17a(Lines(17), f)
+}
+
+func day17b(input []string, out io.Writer) int {
 	grid := buildGrid(input)
 
 	step(&grid, Point{source.x, source.y + 1})
 
 	grid.removeWet()
 
-	if save {
-		grid.save()
-	} else {
-		grid.print(os.Stdout)
-	}
+	grid.print(out)
 
 	return grid.Score()
+}
+
+func Day17b() int {
+	f, err := os.Create("day17b_out.txt")
+	if err != nil {
+		panic(err)
+	}
+	defer f.Close()
+
+	return day17b(Lines(17), f)
 }
