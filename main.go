@@ -16,8 +16,8 @@ func main() {
 			"x=498, y=10..13",
 			"x=504, y=10..13",
 			"y=13, x=498..504",
-		}))
+		}, false))
 		return
 	}
-	fmt.Println(day17a(Lines(17)))
+	fmt.Println(day17a(Lines(17), true))
 }

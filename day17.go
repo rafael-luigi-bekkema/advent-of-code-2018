@@ -10,6 +10,7 @@ type Grid struct {
 	Width, Height    int
 	Data             []byte
 	OffsetX, OffsetY int
+	MinY             int
 	Changed          bool
 }
 
@@ -46,7 +47,7 @@ func (grid *Grid) save() {
 func (grid *Grid) print(out io.Writer) {
 	for i, c := range grid.Data {
 		if i%grid.Width == 0 {
-			fmt.Fprintln(out)
+			fmt.Fprintf(out, "\n%03d: ", i/grid.Width-1)
 		}
 		fmt.Fprintf(out, "%c", c)
 	}
@@ -58,7 +59,7 @@ func (grid *Grid) Score() int {
 	var score int
 	for y := 0; y < grid.Height; y++ {
 		for x := 0; x < grid.Width; x++ {
-			if y == 0 || y == grid.Height-1 {
+			if y <= grid.MinY || y == grid.Height-1 {
 				continue
 			}
 			if val := grid.Data[y*grid.Width+x]; val == water || val == wet {
@@ -85,9 +86,9 @@ func buildGrid(input []string) Grid {
 
 	var points []Point
 
-	var minx, maxx, miny, maxy = source.x, source.x, source.y, source.y
+	var minx, maxx, miny, maxy = 0, 0, 0, 0
 
-	for _, line := range input {
+	for idx, line := range input {
 		var c1, c2 rune
 		var n1, n2, n3 int
 		fmt.Sscanf(line, "%c=%d, %c=%d..%d", &c1, &n1, &c2, &n2, &n3)
@@ -100,19 +101,28 @@ func buildGrid(input []string) Grid {
 				x, y = i, n1
 			}
 			points = append(points, Point{x: x, y: y})
-			if x < minx {
+			if idx == 0 || x < minx {
 				minx = x
 			}
-			if y < miny {
+			if idx == 0 || y < miny {
 				miny = y
 			}
-			if x >= maxx {
+			if idx == 0 || x >= maxx {
 				maxx = x
 			}
-			if y >= maxy {
+			if idx == 0 || y >= maxy {
 				maxy = y
 			}
 		}
+	}
+
+	realminy := miny
+
+	if source.x < minx {
+		minx = source.x
+	}
+	if source.y < miny {
+		miny = source.y
 	}
 
 	height := maxy - miny + 3
@@ -124,6 +134,7 @@ func buildGrid(input []string) Grid {
 		Data:    make([]byte, width*height),
 		OffsetX: minx,
 		OffsetY: miny,
+		MinY:    realminy,
 	}
 
 	for i := range grid.Data {
@@ -136,68 +147,72 @@ func buildGrid(input []string) Grid {
 	return grid
 }
 
-func day17a(input []string) int {
-	grid := buildGrid(input)
-	//grid.print()
+func step(grid *Grid, point Point) {
+	grid.set(point.x, point.y, wet)
+	// time.Sleep(time.Millisecond * 200)
+	// grid.print(os.Stdout)
 
-	t := 0
+	switch grid.get(point.x, point.y+1) {
+	case sand:
+		step(grid, Point{point.x, point.y + 1})
+	case offgrid:
+		return
+	}
 
-	for {
-		grid.Changed = false
-		drop := source
-		var wentLeft, wentRight bool
-	middle:
-		for {
-			var moved bool
-		inner:
-			for {
-				switch grid.get(drop.x, drop.y+1) {
-				case sand, wet:
-				case offgrid:
-					break middle
-				default:
-					break inner
-				}
-
-				drop.y++
-				wentLeft, wentRight = false, false
-				moved = true
-				grid.set(drop.x, drop.y, wet)
-			}
-			if !wentRight {
-				if val := grid.get(drop.x-1, drop.y); val == sand || val == wet {
-					wentLeft = true
-					drop.x--
-					moved = true
-					grid.set(drop.x, drop.y, wet)
-					continue
-				}
-			}
-			if !wentLeft {
-				if val := grid.get(drop.x+1, drop.y); val == sand || val == wet {
-					wentRight = true
-					drop.x++
-					moved = true
-					grid.set(drop.x, drop.y, wet)
-				}
-			}
-			if !moved {
-				grid.set(drop.x, drop.y, water)
-				break
-			}
-		}
-
-		// grid.print()
-		fmt.Printf("t = %d\n", t)
-
-		t++
-		// time.Sleep(time.Millisecond * 100)
-		if t > 100_000 || !grid.Changed {
-			break
+lbl:
+	for x := point.x; x >= grid.OffsetX; x-- {
+		switch grid.get(x, point.y+1) {
+		case clay, sand:
+			break lbl
+		case water:
+		default:
+			return
 		}
 	}
 
-	grid.save()
+lbl2:
+	for x := point.x; x < grid.OffsetX+grid.Width; x++ {
+		switch grid.get(x, point.y+1) {
+		case clay, sand:
+			break lbl2
+		case water:
+		default:
+			return
+		}
+	}
+
+	switch grid.get(point.x-1, point.y) {
+	case sand:
+		step(grid, Point{point.x - 1, point.y})
+		if grid.get(point.x-1, point.y) == water {
+			grid.set(point.x, point.y, water)
+		}
+	case clay:
+		grid.set(point.x, point.y, water)
+	}
+
+	switch grid.get(point.x+1, point.y) {
+	case sand:
+		step(grid, Point{point.x + 1, point.y})
+		if grid.get(point.x+1, point.y) == water {
+			grid.set(point.x, point.y, water)
+		}
+	case clay:
+		grid.set(point.x, point.y, water)
+	}
+}
+
+func day17a(input []string, save bool) int {
+	grid := buildGrid(input)
+	//grid.print()
+
+	step(&grid, Point{source.x, source.y + 1})
+
+	if save {
+		grid.save()
+	} else {
+		grid.print(os.Stdout)
+	}
 	fmt.Println("Done")
 
 	return grid.Score()
