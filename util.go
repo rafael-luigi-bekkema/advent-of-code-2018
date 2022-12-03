@@ -2,7 +2,6 @@ package main
 
 import (
 	"bufio"
-	"constraints"
 	"fmt"
 	"io"
 	"os"
@@ -10,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"golang.org/x/exp/constraints"
 )
 
 func TestEqual[T comparable](t *testing.T, expect, result T, message ...string) {
