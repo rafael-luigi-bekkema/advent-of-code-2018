@@ -1,10 +1,19 @@
 package main
 
-import (
-	"fmt"
-)
+import "fmt"
 
 func main() {
-	fmt.Printf("Day 17a: %d\n", Day17a())
-	fmt.Printf("Day 17b: %d\n", Day17b())
+	initial := `.#.#...|#.
+.....#|##|
+.|..|...#.
+..|#.....#
+#.#|||#|#|
+...#.||...
+.|....|...
+||...#|.#|
+|.||||..|.
+...#.|..|.`
+	fmt.Println(day18a(initial, 1_000_000_000))
+
+	// fmt.Println(day18a(Input(18), 1_000_000_000))
 }
