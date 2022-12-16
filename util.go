@@ -160,6 +160,13 @@ func In[T comparable](items []T, subject T) bool {
 	return false
 }
 
+func If[T any](condition bool, then, els T) T {
+	if condition {
+		return then
+	}
+	return els
+}
+
 func CopySlice[T any](slice []T) []T {
 	result := make([]T, len(slice))
 	copy(result, slice)
